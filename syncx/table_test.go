@@ -6,6 +6,27 @@ import (
 	"testing"
 )
 
+func TestTableNew(t *testing.T) {
+	table := NewSyncTable[string, string, int]()
+	table.Set("a1", "a2", 1)
+	value, ok := table.Get("a1", "a2")
+	assert.Equal(t, 1, value)
+	assert.Equal(t, true, ok)
+	table.Clear()
+	value, ok = table.Get("a1", "a2")
+	assert.Equal(t, 0, value)
+	assert.Equal(t, false, ok)
+
+	table.Set("a3", "a4", 2)
+	value, ok = table.Get("a3", "a4")
+	assert.Equal(t, 2, value)
+	assert.Equal(t, true, ok)
+	table.Delete("a3", "a4")
+	value, ok = table.Get("a1", "a2")
+	assert.Equal(t, 0, value)
+	assert.Equal(t, false, ok)
+}
+
 func TestTableBasic(t *testing.T) {
 	table := &SyncTable[string, string, int]{
 		mu: new(sync.RWMutex),

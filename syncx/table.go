@@ -10,6 +10,13 @@ type SyncTable[K1 comparable, K2 comparable, V any] struct {
 	data table.Table[K1, K2, V]
 }
 
+func NewSyncTable[K1 comparable, K2 comparable, V any]() *SyncTable[K1, K2, V] {
+	return &SyncTable[K1, K2, V]{
+		mu:   &sync.RWMutex{},
+		data: nil,
+	}
+}
+
 // Set sets the value for the given keys
 func (t *SyncTable[K1, K2, V]) Set(key1 K1, key2 K2, value V) {
 	t.mu.Lock()
