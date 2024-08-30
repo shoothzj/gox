@@ -1,4 +1,4 @@
-module github.com/Shoothzj/gox
+module github.com/shoothzj/gox
 
 go 1.18
 
