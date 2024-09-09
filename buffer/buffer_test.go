@@ -47,10 +47,12 @@ func TestAdjustWriteCursor(t *testing.T) {
 	b := NewBuffer(1024)
 	_, err := b.Write([]byte("test"))
 	assert.NoError(t, err, "expected no error during write")
+	assert.Equal(t, 4, b.Size(), "expected size to be 4 after initial write")
 
 	err = b.AdjustWriteCursor(-2)
 	assert.NoError(t, err, "expected no error during valid cursor adjustment")
 	assert.Equal(t, 2, b.writeCursor, "expected write cursor to be adjusted to 2")
+	assert.Equal(t, 2, b.Size(), "expected size to be adjusted to 2 after cursor adjustment")
 
 	err = b.AdjustWriteCursor(2000)
 	assert.Error(t, err, "expected out of bounds error for invalid cursor adjustment")
