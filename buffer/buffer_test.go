@@ -59,6 +59,24 @@ func TestBufferPeek(t *testing.T) {
 	assert.Equal(t, 0, b.readCursor, "expected read cursor to remain unchanged after peek")
 }
 
+func TestBufferSkip(t *testing.T) {
+	b := NewBuffer(1024)
+	data := []byte("hello world")
+	_, err := b.Write(data)
+	assert.NoError(t, err, "expected no error during write")
+
+	err = b.Skip(6) // Skipping "hello "
+	assert.NoError(t, err, "expected no error during skip")
+	assert.Equal(t, 6, b.readCursor, "expected read cursor to be at 6 after skip")
+	assert.Equal(t, 5, b.Size(), "expected size to be 5 after skip")
+
+	dst := make([]byte, 5)
+	n, err := b.Read(dst)
+	assert.NoError(t, err, "expected no error during read after skip")
+	assert.Equal(t, 5, n, "expected to read 5 bytes after skip")
+	assert.Equal(t, "world", string(dst), "expected to read 'world' after skip")
+}
+
 func TestAdjustWriteCursor(t *testing.T) {
 	b := NewBuffer(1024)
 	_, err := b.Write([]byte("test"))
