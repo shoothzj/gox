@@ -12,9 +12,16 @@ type Buffer struct {
 
 func NewBuffer(cap int) *Buffer {
 	var initCap int
-	if cap > 1*1024*1024 {
+	switch {
+	case cap > 4*1024*1024:
+		initCap = cap / 64
+	case cap > 1*1024*1024:
 		initCap = cap / 32
-	} else {
+	case cap > 512*1024:
+		initCap = cap / 16
+	case cap > 128*1024:
+		initCap = cap / 4
+	default:
 		initCap = cap
 	}
 	return &Buffer{
