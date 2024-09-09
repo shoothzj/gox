@@ -43,6 +43,22 @@ func TestBufferOverflow(t *testing.T) {
 	assert.Error(t, err, "expected overflow error during write")
 }
 
+func TestBufferPeek(t *testing.T) {
+	b := NewBuffer(1024)
+	data := []byte("hello")
+	_, err := b.Write(data)
+	assert.NoError(t, err, "expected no error during write")
+
+	dst := make([]byte, 5)
+	n, err := b.Peek(dst)
+	assert.NoError(t, err, "expected no error during peek")
+	assert.Equal(t, len(data), n, "expected number of bytes peeked to match input")
+	assert.Equal(t, "hello", string(dst), "expected output to be 'hello'")
+
+	// Ensure that the read cursor has not moved
+	assert.Equal(t, 0, b.readCursor, "expected read cursor to remain unchanged after peek")
+}
+
 func TestAdjustWriteCursor(t *testing.T) {
 	b := NewBuffer(1024)
 	_, err := b.Write([]byte("test"))
