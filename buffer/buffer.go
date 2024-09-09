@@ -104,6 +104,15 @@ func (b *Buffer) Peek(dst []byte) (int, error) {
 	return n, nil
 }
 
+func (b *Buffer) Skip(offset int) error {
+	if offset < 0 || b.readCursor+offset > b.writeCursor {
+		return fmt.Errorf("skip out of bounds")
+	}
+	b.readCursor += offset
+	b.size -= offset
+	return nil
+}
+
 func (b *Buffer) WritableSlice() []byte {
 	return b.bytes[b.writeCursor:]
 }
