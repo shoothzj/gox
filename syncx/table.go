@@ -1,7 +1,7 @@
 package syncx
 
 import (
-	"github.com/Shoothzj/gox/table"
+	"github.com/shoothzj/gox/table"
 	"sync"
 )
 
