@@ -9,7 +9,7 @@ import (
 
 var pidPattern = regexp.MustCompile("[0-9]+")
 
-func ProcessExists(processName string) (bool, error) {
+func ProcessNameExists(processName string) (bool, error) {
 	result := false
 	fileInfos, err := os.ReadDir("/proc")
 	if err != nil {
