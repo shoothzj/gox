@@ -20,27 +20,19 @@ func ProcessExists(processName string) (bool, error) {
 		if !pidPattern.MatchString(name) {
 			continue
 		}
-		cmdLine, err := parseCmdLine("/proc/" + info.Name() + "/cmdline")
+		content, err := os.ReadFile("/proc/" + info.Name() + "/cmdline")
 		if err != nil {
 			// the proc may end during the loop, ignore it
 			continue
 		}
+		if len(content) == 0 {
+			continue
+		}
+		split := strings.Split(string(bytes.TrimRight(content, string("\x00"))), string(byte(0)))
+		cmdLine := strings.Join(split, " ")
 		if strings.Contains(cmdLine, processName) {
 			result = true
 		}
 	}
 	return result, err
-}
-
-func parseCmdLine(path string) (string, error) {
-	cmdData, err := os.ReadFile(path)
-	if err != nil {
-		return "", err
-	}
-	if len(cmdData) < 1 {
-		return "", nil
-	}
-
-	split := strings.Split(string(bytes.TrimRight(cmdData, string("\x00"))), string(byte(0)))
-	return strings.Join(split, " "), nil
 }
