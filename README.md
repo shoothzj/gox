@@ -1,6 +1,6 @@
 # gox
 
-Simple go data structure extension
+**gox** is a collection of reusable utility functions and types.
 
 ## notice
 
