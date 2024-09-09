@@ -97,6 +97,7 @@ func (b *Buffer) AdjustWriteCursor(offset int) error {
 		return fmt.Errorf("write cursor adjustment out of bounds")
 	}
 	b.writeCursor = newCursor
+	b.size += offset
 	return nil
 }
 
