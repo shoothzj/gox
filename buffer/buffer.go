@@ -94,6 +94,16 @@ func (b *Buffer) expand() {
 	}
 }
 
+func (b *Buffer) Peek(dst []byte) (int, error) {
+	n := len(dst)
+	if n > b.size {
+		n = b.size
+	}
+
+	copy(dst, b.bytes[b.readCursor:b.readCursor+n])
+	return n, nil
+}
+
 func (b *Buffer) WritableSlice() []byte {
 	return b.bytes[b.writeCursor:]
 }
