@@ -45,6 +45,20 @@ func (b *Buffer) Read(dst []byte) (int, error) {
 	return n, nil
 }
 
+func (b *Buffer) ReadNBytes(n int) ([]byte, error) {
+	if n > b.size {
+		return nil, fmt.Errorf("not enough data to read")
+	}
+
+	data := b.bytes[b.readCursor : b.readCursor+n]
+	b.readCursor += n
+	b.size -= n
+
+	b.compact()
+
+	return data, nil
+}
+
 func (b *Buffer) ReadExactly(dst []byte) error {
 	n := len(dst)
 	if n > b.size {
