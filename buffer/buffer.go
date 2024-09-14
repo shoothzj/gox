@@ -30,6 +30,13 @@ func NewBuffer(cap int) *Buffer {
 	}
 }
 
+func NewBufferFromBytes(bytes []byte) *Buffer {
+	return &Buffer{
+		cap:   len(bytes),
+		bytes: bytes,
+	}
+}
+
 func (b *Buffer) Read(dst []byte) (int, error) {
 	n := len(dst)
 	if n > b.size {
