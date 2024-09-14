@@ -102,6 +102,8 @@ func TestBufferCompact(t *testing.T) {
 	_, err = b.Read(dst) // read 'hello'
 	assert.NoError(t, err, "expected no error during read")
 
+	b.Compact()
+
 	assert.Equal(t, 0, b.readCursor, "expected read cursor reset to 0")
 	assert.Equal(t, 6, b.writeCursor, "expected write cursor at 6 after reading")
 }

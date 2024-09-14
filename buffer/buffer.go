@@ -47,8 +47,6 @@ func (b *Buffer) Read(dst []byte) (int, error) {
 	b.readCursor += n
 	b.size -= n
 
-	b.compact()
-
 	return n, nil
 }
 
@@ -60,8 +58,6 @@ func (b *Buffer) ReadNBytes(n int) ([]byte, error) {
 	data := b.bytes[b.readCursor : b.readCursor+n]
 	b.readCursor += n
 	b.size -= n
-
-	b.compact()
 
 	return data, nil
 }
@@ -76,12 +72,10 @@ func (b *Buffer) ReadExactly(dst []byte) error {
 	b.readCursor += n
 	b.size -= n
 
-	b.compact()
-
 	return nil
 }
 
-func (b *Buffer) compact() {
+func (b *Buffer) Compact() {
 	if b.readCursor > 0 {
 		copy(b.bytes, b.bytes[b.readCursor:b.writeCursor])
 		b.writeCursor -= b.readCursor
