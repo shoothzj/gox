@@ -119,6 +119,17 @@ func (b *Buffer) Peek(dst []byte) (int, error) {
 	return n, nil
 }
 
+func (b *Buffer) PeekExactly(dst []byte) error {
+	n := len(dst)
+	if n > b.size {
+		return fmt.Errorf("not enough data to read")
+	}
+
+	copy(dst, b.bytes[b.readCursor:b.readCursor+n])
+
+	return nil
+}
+
 func (b *Buffer) Skip(offset int) error {
 	if offset < 0 || b.readCursor+offset > b.writeCursor {
 		return fmt.Errorf("skip out of bounds")
