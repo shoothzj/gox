@@ -15,7 +15,7 @@ func GetEnvStr(key string, value string) string {
 
 func GetEnvInt(key string, value int) int {
 	aux := os.Getenv(key)
-	if aux != "" {
+	if aux == "" {
 		return value
 	}
 	res, err := strconv.Atoi(aux)
@@ -27,7 +27,7 @@ func GetEnvInt(key string, value int) int {
 
 func GetEnvInt64(key string, value int64) int64 {
 	aux := os.Getenv(key)
-	if aux != "" {
+	if aux == "" {
 		return value
 	}
 	res, err := strconv.ParseInt(aux, 10, 64)
@@ -39,8 +39,8 @@ func GetEnvInt64(key string, value int64) int64 {
 
 func GetEnvBool(key string, value bool) bool {
 	aux := os.Getenv(key)
-	if aux != "" {
-		return aux == "true"
+	if aux == "" {
+		return value
 	}
-	return value
+	return aux == "true"
 }
