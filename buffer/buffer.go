@@ -32,8 +32,10 @@ func NewBuffer(cap int) *Buffer {
 
 func NewBufferFromBytes(bytes []byte) *Buffer {
 	return &Buffer{
-		cap:   len(bytes),
-		bytes: bytes,
+		cap:         len(bytes),
+		bytes:       bytes,
+		writeCursor: len(bytes),
+		size:        len(bytes),
 	}
 }
 
