@@ -120,3 +120,24 @@ func TestBufferReadAll(t *testing.T) {
 	assert.Equal(t, b.writeCursor, b.readCursor, "expected read cursor to be equal to write cursor after ReadAll")
 	assert.Equal(t, 0, b.ReadableSize(), "expected size to be 0 after ReadAll")
 }
+
+func TestNewBufferFromBytes(t *testing.T) {
+	// Initialize buffer with some data
+	initialData := []byte("test data")
+	b := NewBufferFromBytes(initialData)
+
+	// Verify that the buffer is initialized correctly
+	assert.Equal(t, len(initialData), b.Capacity(), "expected buffer capacity to match length of initial data")
+	assert.Equal(t, len(initialData), b.ReadableSize(), "expected buffer size to match length of initial data")
+	assert.Equal(t, 0, b.readCursor, "expected read cursor to be 0 after initialization")
+	assert.Equal(t, len(initialData), b.writeCursor, "expected write cursor to be at the end of the initial data")
+
+	// Test reading from the buffer
+	readData := make([]byte, len(initialData))
+	n, err := b.Read(readData)
+	assert.NoError(t, err, "expected no error during read")
+	assert.Equal(t, len(initialData), n, "expected number of bytes read to match length of initial data")
+	assert.Equal(t, string(initialData), string(readData), "expected read data to match initial data")
+	assert.Equal(t, 0, b.ReadableSize(), "expected buffer size to be 0 after reading all data")
+	assert.Equal(t, b.writeCursor, b.readCursor, "expected read cursor to be equal to write cursor after reading all data")
+}
