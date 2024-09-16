@@ -75,6 +75,13 @@ func (b *Buffer) ReadExactly(dst []byte) error {
 	return nil
 }
 
+func (b *Buffer) ReadAll() []byte {
+	data := b.bytes[b.readCursor:b.writeCursor]
+	b.readCursor = b.writeCursor
+	b.size = 0
+	return data
+}
+
 func (b *Buffer) Compact() {
 	if b.readCursor > 0 {
 		copy(b.bytes, b.bytes[b.readCursor:b.writeCursor])
@@ -97,6 +104,19 @@ func (b *Buffer) Write(p []byte) (int, error) {
 	b.size += n
 
 	return n, nil
+}
+
+func (b *Buffer) WriteExactly(p []byte) error {
+	n := len(p)
+	if n > (b.cap - b.size) {
+		return fmt.Errorf("buffer overflow")
+	}
+
+	copy(b.bytes[b.writeCursor:], p)
+	b.writeCursor += n
+	b.size += n
+
+	return nil
 }
 
 func (b *Buffer) expand() {
@@ -157,6 +177,6 @@ func (b *Buffer) Capacity() int {
 	return b.cap
 }
 
-func (b *Buffer) Size() int {
+func (b *Buffer) ReadableSize() int {
 	return b.size
 }
