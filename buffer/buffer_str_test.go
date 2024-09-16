@@ -5,13 +5,13 @@ import (
 	"testing"
 )
 
-func TestPutString(t *testing.T) {
+func TestWriteString(t *testing.T) {
 	b := NewBuffer(1024)
 	str := "hello world"
 
-	err := b.PutString(str)
-	assert.NoError(t, err, "expected no error during PutString")
-	assert.Equal(t, len(str)+4, b.ReadableSize(), "expected size to be string length + 4 for length prefix")
+	err := b.WriteString(str)
+	assert.NoError(t, err, "expected no error during WriteString")
+	assert.Equal(t, len(str), b.ReadableSize(), "expected size to be the string length")
 }
 
 func TestReadString(t *testing.T) {
@@ -19,31 +19,31 @@ func TestReadString(t *testing.T) {
 	str := "hello world"
 
 	// Write the string
-	err := b.PutString(str)
-	assert.NoError(t, err, "expected no error during PutString")
+	err := b.WriteString(str)
+	assert.NoError(t, err, "expected no error during WriteString")
 
 	// Reset read cursor for reading
 	b.readCursor = 0
 
 	// Read the string
-	readStr, err := b.ReadString()
+	readStr, err := b.ReadString(len(str))
 	assert.NoError(t, err, "expected no error during ReadString")
 	assert.Equal(t, str, readStr, "expected read string to match written string")
 }
 
-func TestPutAndReadString(t *testing.T) {
+func TestWriteAndReadString(t *testing.T) {
 	b := NewBuffer(1024)
 	str := "test string"
 
 	// Write the string
-	err := b.PutString(str)
-	assert.NoError(t, err, "expected no error during PutString")
+	err := b.WriteString(str)
+	assert.NoError(t, err, "expected no error during WriteString")
 
 	// Reset read cursor for reading
 	b.readCursor = 0
 
 	// Read the string
-	readStr, err := b.ReadString()
+	readStr, err := b.ReadString(len(str))
 	assert.NoError(t, err, "expected no error during ReadString")
 	assert.Equal(t, str, readStr, "expected read string to match written string")
 }

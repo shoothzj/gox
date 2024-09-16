@@ -10,9 +10,9 @@ func (b *Buffer) ReadBool() (bool, error) {
 	return bytes[0] == 1, nil
 }
 
-// PutBool writes a boolean value to the buffer.
+// WriteBool writes a boolean value to the buffer.
 // It stores the boolean as a single byte (0 for false, 1 for true).
-func (b *Buffer) PutBool(x bool) error {
+func (b *Buffer) WriteBool(x bool) error {
 	var val byte
 	if x {
 		val = 1
