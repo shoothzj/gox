@@ -9,8 +9,8 @@ import (
 func TestBufferBoolTrue(t *testing.T) {
 	b := NewBuffer(1)
 
-	err := b.PutBool(true)
-	assert.NoError(t, err, "PutBool true failed")
+	err := b.WriteBool(true)
+	assert.NoError(t, err, "WriteBool true failed")
 
 	readBoolVal, err := b.ReadBool()
 	assert.NoError(t, err, "ReadBool failed")
@@ -20,8 +20,8 @@ func TestBufferBoolTrue(t *testing.T) {
 func TestBufferBoolFalse(t *testing.T) {
 	b := NewBuffer(1)
 
-	err := b.PutBool(false)
-	assert.NoError(t, err, "PutBool false failed")
+	err := b.WriteBool(false)
+	assert.NoError(t, err, "WriteBool false failed")
 
 	readBoolVal, err := b.ReadBool()
 	assert.NoError(t, err, "ReadBool failed")
