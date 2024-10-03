@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/go-sql-driver/mysql v1.8.1
+	github.com/mattn/go-sqlite3 v1.14.23
 	github.com/stretchr/testify v1.9.0
 	github.com/testcontainers/testcontainers-go/modules/mysql v0.28.0
 )
