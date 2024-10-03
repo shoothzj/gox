@@ -3,23 +3,25 @@ package flyway
 import (
 	"database/sql"
 	"fmt"
+	"github.com/shoothzj/gox/db"
+	"hash/crc32"
 	"log"
 	"time"
 )
 
-type Config struct {
-	Db *sql.DB
-}
-
 type Flyway struct {
-	db *sql.DB
+	dbx *db.Dbx
 }
 
-func NewFlyway(config *Config) (*Flyway, error) {
+func (f *Flyway) Db() *sql.DB {
+	return f.dbx.Db()
+}
+
+func NewFlyway(dbx *db.Dbx) (*Flyway, error) {
 	flyway := Flyway{
-		db: config.Db,
+		dbx: dbx,
 	}
-	exec, err := flyway.db.Exec(`CREATE TABLE IF NOT EXISTS flyway_schema_history (
+	exec, err := flyway.Db().Exec(`CREATE TABLE IF NOT EXISTS flyway_schema_history (
 		installed_rank INT NOT NULL,
 		version VARCHAR(50) COLLATE utf8mb4_bin DEFAULT NULL,
 		description VARCHAR(200) COLLATE utf8mb4_bin NOT NULL,
@@ -65,7 +67,7 @@ func (f *Flyway) Migrate(schemas []Schema) error {
 
 	for _, schema := range schemas {
 		var count int
-		err := f.db.QueryRow("SELECT COUNT(1) FROM flyway_schema_history WHERE version = ?", schema.Version).Scan(&count)
+		err := f.Db().QueryRow("SELECT COUNT(1) FROM flyway_schema_history WHERE version = ?", schema.Version).Scan(&count)
 		if err != nil {
 			return fmt.Errorf("error checking schema version %d: %v", schema.Version, err)
 		}
@@ -78,15 +80,17 @@ func (f *Flyway) Migrate(schemas []Schema) error {
 		log.Printf("Applying migration: Version %d - %s", schema.Version, schema.Description)
 		startTime := time.Now()
 
-		_, err = f.db.Exec(schema.Sql)
+		_, err = f.Db().Exec(schema.Sql)
 		if err != nil {
 			return fmt.Errorf("error executing migration script for version %d: %v", schema.Version, err)
 		}
 
 		executionTime := int(time.Since(startTime).Milliseconds())
 
-		_, err = f.db.Exec("INSERT INTO flyway_schema_history (installed_rank, version, description, type, script, checksum, installed_by, execution_time, success) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-			schema.Version, schema.Version, schema.Description, "SQL", schema.Script, nil, "flyway_user", executionTime, 1)
+		checksum := calculateChecksum(schema.Sql)
+
+		_, err = f.Db().Exec("INSERT INTO flyway_schema_history (installed_rank, version, description, type, script, checksum, installed_by, execution_time, success) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+			schema.Version, schema.Version, schema.Description, "SQL", schema.Script, checksum, f.dbx.User(), executionTime, 1)
 		if err != nil {
 			return fmt.Errorf("error recording migration version %d: %v", schema.Version, err)
 		}
@@ -98,7 +102,7 @@ func (f *Flyway) Migrate(schemas []Schema) error {
 
 func (f *Flyway) acquireLock() error {
 	var result int
-	err := f.db.QueryRow("SELECT GET_LOCK('flyway_lock', 10)").Scan(&result)
+	err := f.Db().QueryRow("SELECT GET_LOCK('flyway_lock', 10)").Scan(&result)
 	if err != nil {
 		return fmt.Errorf("error acquiring lock: %v", err)
 	}
@@ -110,7 +114,7 @@ func (f *Flyway) acquireLock() error {
 
 func (f *Flyway) releaseLock() error {
 	var result int
-	err := f.db.QueryRow("SELECT RELEASE_LOCK('flyway_lock')").Scan(&result)
+	err := f.Db().QueryRow("SELECT RELEASE_LOCK('flyway_lock')").Scan(&result)
 	if err != nil {
 		return fmt.Errorf("error releasing lock: %v", err)
 	}
@@ -118,4 +122,10 @@ func (f *Flyway) releaseLock() error {
 		return fmt.Errorf("failed to release lock")
 	}
 	return nil
+}
+
+// calculateChecksum calculates the CRC32 checksum of the migration script
+func calculateChecksum(sql string) int32 {
+	checksum := crc32.ChecksumIEEE([]byte(sql))
+	return int32(checksum)
 }
