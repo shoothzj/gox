@@ -9,16 +9,16 @@ import (
 	"time"
 )
 
-type Flyway struct {
+type Migrator struct {
 	dbx *db.Dbx
 }
 
-func (f *Flyway) Db() *sql.DB {
+func (f *Migrator) Db() *sql.DB {
 	return f.dbx.Db()
 }
 
-func NewFlyway(dbx *db.Dbx) (*Flyway, error) {
-	flyway := Flyway{
+func NewFlyway(dbx *db.Dbx) (*Migrator, error) {
+	flyway := Migrator{
 		dbx: dbx,
 	}
 	var err error
@@ -66,15 +66,8 @@ func NewFlyway(dbx *db.Dbx) (*Flyway, error) {
 	return &flyway, nil
 }
 
-type Schema struct {
-	Version     int
-	Description string
-	Script      string
-	Sql         string
-}
-
 // Migrate applies the schema migrations
-func (f *Flyway) Migrate(schemas []Schema) error {
+func (f *Migrator) Migrate(schemas []Schema) error {
 	err := f.acquireLock()
 	if err != nil {
 		return err
@@ -121,7 +114,7 @@ func (f *Flyway) Migrate(schemas []Schema) error {
 	return nil
 }
 
-func (f *Flyway) acquireLock() error {
+func (f *Migrator) acquireLock() error {
 	if f.dbx.Driver() == db.DriverMySQL {
 		var result int
 		err := f.Db().QueryRow("SELECT GET_LOCK('flyway_lock', 10)").Scan(&result)
@@ -137,7 +130,7 @@ func (f *Flyway) acquireLock() error {
 	}
 }
 
-func (f *Flyway) releaseLock() error {
+func (f *Migrator) releaseLock() error {
 	if f.dbx.Driver() == db.DriverMySQL {
 		var result int
 		err := f.Db().QueryRow("SELECT RELEASE_LOCK('flyway_lock')").Scan(&result)
