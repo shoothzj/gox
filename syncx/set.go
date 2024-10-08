@@ -17,6 +17,12 @@ func (s *Set[T]) Remove(value T) {
 	s.m.Delete(value)
 }
 
+// Get returns the element from the set
+func (s *Set[T]) Get(value T) (T, bool) {
+	_, ok := s.m.Load(value)
+	return value, ok
+}
+
 // Contains checks if the set contains the element
 func (s *Set[T]) Contains(value T) bool {
 	_, ok := s.m.Load(value)
