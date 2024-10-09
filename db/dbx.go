@@ -45,6 +45,8 @@ func NewDbx(config *Config) (*Dbx, error) {
 	switch config.Driver {
 	case DriverMySQL:
 		dsn = fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", config.User, config.Password, config.Host, config.Port, config.DbName)
+	case DriverSqlite:
+		dsn = ":memory:"
 	default:
 		return nil, fmt.Errorf("unsupported Driver: %s", config.Driver)
 	}
